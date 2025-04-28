@@ -1,0 +1,36 @@
+---
+- name: главный
+  hosts: localhost
+  become: yes
+  tasks:
+    - name: Создать пользователя ibmonitor
+      ansible.builtin.user:
+        name: ibmonitor
+        password: "{{ '123' | password_hash('sha512') }}"
+        shell: /bin/bash
+        create_home: yes
+
+    - name: Созда группу srv_adm если её нет
+      ansible.builtin.group:
+        name: srv_adm
+        state: present
+
+    - name: Добавить пользака ibmonitor в группу srv_adm
+      ansible.builtin.user:
+        name: ibmonitor
+        groups: srv_adm
+        append: yes
+
+    - name: Разрешить вход по SSH только группе srv_adm
+      ansible.builtin.lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: '^AllowGroups'
+        line: 'AllowGroups srv_adm'
+        state: present
+        create: yes
+        backup: yes
+
+    - name: Перезапуск SSH
+      ansible.builtin.systemd:
+        name: sshd
+        state: restarted

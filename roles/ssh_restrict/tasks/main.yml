@@ -1,0 +1,13 @@
+---
+- name: Разрешить подключение по SSH только пользователям из группы srv_adm
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^AllowGroups'
+    line: 'AllowGroups srv_adm'
+    create: yes
+    backup: yes
+
+- name: SSH
+  service:
+    name: sshd
+    state: restarted

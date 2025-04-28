@@ -1,0 +1,7 @@
+---
+- name: создать пользователя ibmonitor
+  user:
+    name: ibmonitor
+    password: "{{ '123' | password_hash('sha512') }}"
+    shell: /bin/bash
+    create_home: yes
